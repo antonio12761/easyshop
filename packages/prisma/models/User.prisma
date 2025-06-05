@@ -1,0 +1,39 @@
+model User {
+  id                     String        @id @default(cuid())
+  name                   String?
+  email                  String        @unique
+  emailVerified          DateTime?
+  image                  String?
+  passwordHash           String        @map("password_hash")
+  role                   Role          @default(USER)
+  accounts               Account[]
+  sessions               Session[]
+  userSessions           UserSession[]
+  accessLogs             AccessLog[]
+  
+  // Relazioni per i log e token
+  activityLogs           ActivityLog[]
+  auditLogs              AuditLog[]
+  emailTokens            EmailVerificationToken[] @relation("UserToEmailTokens")
+  passwordResetTokens    PasswordResetToken[]
+  twoFactorCodes         TwoFactorCode[]
+  
+  emailVerificationToken String?
+  secondaryEmail         String?
+  secondaryEmailVerified DateTime?
+  twoFactorEnabled       Boolean       @default(false)
+  twoFactorSecret        String?
+  lastLoginAt            DateTime?
+  previousLoginAt        DateTime?
+  lastLoginIp            String?
+  failedLoginAttempts    Int           @default(0)
+  lockedUntil            DateTime?
+  passwordChangedAt      DateTime?
+  backupCodes            String[]      @default([])
+  backupCodesUsed        String[]      @default([])
+  hasSeenWelcome         Boolean       @default(false)
+  createdAt              DateTime      @default(now())
+  updatedAt              DateTime      @updatedAt
+
+  @@map("users")
+}

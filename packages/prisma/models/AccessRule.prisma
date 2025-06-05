@@ -1,0 +1,14 @@
+model AccessRule {
+  id          String   @id @default(cuid())
+  type        String   // "country", "ip", "ip_range"
+  value       String   // "IT", "192.168.1.1", "192.168.1.0/24"
+  action      String   // "allow", "deny"
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  accessLogs  AccessLog[]
+
+  @@map("access_rules")
+}

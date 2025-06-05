@@ -1,0 +1,5 @@
+// Definizione degli enum - DEVE essere prima dei modelli che lo usano
+enum Role {
+  USER
+  ADMIN
+}

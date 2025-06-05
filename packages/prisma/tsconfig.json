@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "outDir": "dist",
+    "composite": true,
+    "declaration": true,
+  },
+  "include": ["src", "generate-schema.ts"]
+}

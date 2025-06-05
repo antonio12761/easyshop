@@ -1,0 +1,21 @@
+model UserSession {
+  id           String   @id @default(cuid())
+  userId       String
+  deviceInfo   String
+  browser      String
+  os           String
+  ip           String
+  location     String?
+  userAgent    String
+  createdAt    DateTime @default(now())
+  lastActiveAt DateTime
+  expiresAt    DateTime
+  isActive     Boolean  @default(true)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isActive])
+  @@index([expiresAt])
+  @@map("user_sessions")
+}

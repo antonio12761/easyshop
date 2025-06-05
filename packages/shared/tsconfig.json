@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx", 
+    "allowJs": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    "target": "ESNext",
+    "types": ["node", "next"],
+    "noEmit": true, // Evita output js (opzionale)
+    "baseUrl": ".", // o relativo al repo se serve
+  },
+  "include": [".", "./**/*"]
+}

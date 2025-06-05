@@ -1,0 +1,11 @@
+// Questo file contiene la configurazione del datasource e del generator
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  // directUrl = env("DIRECT_URL") // Necessario per Neon
+}
+

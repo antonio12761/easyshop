@@ -1,0 +1,19 @@
+model ActivityLog {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  timestamp DateTime @default(now())
+  ip        String?
+  userAgent String?
+  
+  // Nuovi campi per audit dettagliato
+  action    String?
+  resource  String?
+  details   String?
+  success   Boolean?
+
+  @@index([userId, timestamp])
+  @@index([action])
+  @@index([success])
+  @@map("ActivityLog")
+}

@@ -1,0 +1,23 @@
+apps/
+└── mobile/
+    └── src/
+        ├── components/
+        │   ├── ui/
+        │   │   ├── Button.tsx
+        │   │   ├── Input.tsx
+        │   │   ├── LoadingIndicator.tsx
+        │   │   └── Switch.tsx
+        │   └── layout/
+        │       ├── Header.tsx
+        │       └── Footer.tsx
+        ├── screens/
+        │   ├── LoginScreen.tsx
+        │   ├── RegisterScreen.tsx
+        │   └── HomeScreen.tsx
+        ├── navigation/
+        │   └── AppNavigator.tsx
+        ├── lib/
+        │   └── auth.ts         ← Chiama azioni da `@auth`
+        ├── hooks/
+        │   └── useToast.ts    ← Importa da `@shared` se possibile
+        └── App.tsx

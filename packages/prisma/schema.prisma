@@ -1,0 +1,243 @@
+// Questo file contiene la configurazione del datasource e del generator
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  // directUrl = env("DIRECT_URL") // Necessario per Neon
+}
+
+
+
+// Definizione degli enum - DEVE essere prima dei modelli che lo usano
+enum Role {
+  USER
+  ADMIN
+}
+
+model AccessLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  ip        String
+  country   String
+  userAgent String?  @db.Text
+  path      String
+  allowed   Boolean
+  reason    String
+  ruleId    String?
+  createdAt DateTime @default(now())
+  
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  rule AccessRule? @relation(fields: [ruleId], references: [id], onDelete: SetNull)
+
+  @@map("access_logs")
+}
+
+model AccessRule {
+  id          String   @id @default(cuid())
+  type        String   // "country", "ip", "ip_range"
+  value       String   // "IT", "192.168.1.1", "192.168.1.0/24"
+  action      String   // "allow", "deny"
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  accessLogs  AccessLog[]
+
+  @@map("access_rules")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("Account")
+}
+
+model ActivityLog {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  timestamp DateTime @default(now())
+  ip        String?
+  userAgent String?
+  
+  // Nuovi campi per audit dettagliato
+  action    String?
+  resource  String?
+  details   String?
+  success   Boolean?
+
+  @@index([userId, timestamp])
+  @@index([action])
+  @@index([success])
+  @@map("ActivityLog")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String
+  resource  String
+  details   String?  // JSON string
+  ipAddress String?
+  userAgent String?
+  success   Boolean
+  timestamp DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([action])
+  @@index([timestamp])
+  @@index([success])
+  @@map("AuditLog")
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  email     String?
+  userId    String
+  user      User     @relation("UserToEmailTokens", fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@map("EmailVerificationToken")
+}
+
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@map("PasswordResetToken")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  
+  // Campi aggiuntivi per il tracking delle sessioni
+  userAgent    String?  @db.Text
+  ipAddress    String?
+  device       String?
+  browser      String?
+  os           String?
+  location     String?
+  lastActive   DateTime @default(now())
+  createdAt    DateTime @default(now())
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model TwoFactorCode {
+  id        String   @id @default(uuid())
+  code      String
+  userId    String   // Rimosso @unique per permettere più codici per utente
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  
+  @@index([userId])
+  @@map("TwoFactorCode")
+}
+
+model User {
+  id                     String        @id @default(cuid())
+  name                   String?
+  email                  String        @unique
+  emailVerified          DateTime?
+  image                  String?
+  passwordHash           String        @map("password_hash")
+  role                   Role          @default(USER)
+  accounts               Account[]
+  sessions               Session[]
+  userSessions           UserSession[]
+  accessLogs             AccessLog[]
+  
+  // Relazioni per i log e token
+  activityLogs           ActivityLog[]
+  auditLogs              AuditLog[]
+  emailTokens            EmailVerificationToken[] @relation("UserToEmailTokens")
+  passwordResetTokens    PasswordResetToken[]
+  twoFactorCodes         TwoFactorCode[]
+  
+  emailVerificationToken String?
+  secondaryEmail         String?
+  secondaryEmailVerified DateTime?
+  twoFactorEnabled       Boolean       @default(false)
+  twoFactorSecret        String?
+  lastLoginAt            DateTime?
+  previousLoginAt        DateTime?
+  lastLoginIp            String?
+  failedLoginAttempts    Int           @default(0)
+  lockedUntil            DateTime?
+  passwordChangedAt      DateTime?
+  backupCodes            String[]      @default([])
+  backupCodesUsed        String[]      @default([])
+  hasSeenWelcome         Boolean       @default(false)
+  createdAt              DateTime      @default(now())
+  updatedAt              DateTime      @updatedAt
+
+  @@map("users")
+}
+
+
+model UserSession {
+  id           String   @id @default(cuid())
+  userId       String
+  deviceInfo   String
+  browser      String
+  os           String
+  ip           String
+  location     String?
+  userAgent    String
+  createdAt    DateTime @default(now())
+  lastActiveAt DateTime
+  expiresAt    DateTime
+  isActive     Boolean  @default(true)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isActive])
+  @@index([expiresAt])
+  @@map("user_sessions")
+}
+
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("VerificationToken")
+}

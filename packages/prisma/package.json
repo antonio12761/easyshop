@@ -1,0 +1,50 @@
+{
+  "name": "@packages/prisma",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "private": true,
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "require": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc && prisma generate",
+    "watch": "nodemon --exec \"pnpm --workspace-root exec tsx packages/prisma/generate-schema.ts && pnpm --workspace-root exec prisma generate --schema=packages/prisma/schema.prisma\" --watch prisma/models --watch prisma/base",
+    "prisma:build": "pnpm --workspace-root exec tsx packages/prisma/generate-schema.ts && pnpm --workspace-root exec prisma generate --schema=packages/prisma/schema.prisma",
+    "prisma:watch": "pnpm --filter prisma run watch",
+    "prisma:rebuild": "rm -f packages/prisma/schema.prisma && pnpm prisma:build",
+    "db:migrate": "dotenv -e ../../.env.local -- prisma migrate dev --schema=schema.prisma --skip-generate",
+    "db:push": "dotenv -e ../../.env.local -- prisma db push --schema=schema.prisma",
+    "db:studio": "dotenv -e ../../.env.local -- prisma studio --schema=schema.prisma",
+    "db:generate": "dotenv -e ../../.env.local -- prisma generate --schema=schema.prisma",
+    "db:seed": "tsx seed.ts",
+    "create-admin": "dotenv -e ../../.env.local -- tsx create-admin.ts",
+    "list-users": "dotenv -e ../../.env.local -- tsx list-users.ts",
+    "test-connection": "dotenv -e ../../.env.local -- tsx test-connection.ts",
+    "test-db-url": "dotenv -e ../../.env.local -- tsx test-db-url.ts",
+    "fix-studio": "dotenv -e ../../.env.local -- tsx fix-db-connection.ts",
+    "check-schema": "tsx check-schema-structure.ts",
+    "show-generate": "tsx show-generate-schema.ts"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^0.9.0",
+    "@prisma/client": "^6.8.2",
+    "dotenv-flow": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.46",
+    "dotenv": "^16.5.0",
+    "dotenv-cli": "^8.0.0",
+    "prisma": "^6.8.2",
+    "tsx": "^4.19.4",
+    "bcryptjs": "^2.4.3",
+    "@types/bcryptjs": "^2.4.6"
+  }
+}

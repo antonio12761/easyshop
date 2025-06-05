@@ -1,0 +1,11 @@
+model TwoFactorCode {
+  id        String   @id @default(uuid())
+  code      String
+  userId    String   // Rimosso @unique per permettere più codici per utente
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  
+  @@index([userId])
+  @@map("TwoFactorCode")
+}

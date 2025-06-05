@@ -1,0 +1,5 @@
+{
+  "watch": ["prisma/models", "prisma/base"],
+  "ext": "prisma",
+  "exec": "pnpm exec tsx packages/prisma/generate-schema.ts && pnpm exec prisma generate --schema=packages/prisma/schema.prisma"
+}

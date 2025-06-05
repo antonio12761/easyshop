@@ -1,0 +1,30 @@
+{
+  "name": "@packages/shared",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "types": "index.d.ts",
+  "private": true,
+  "exports": {
+    ".": {
+      "import": "./index.ts",
+      "require": "./index.ts"
+    },
+    "./config/*": {
+      "import": "./config/*.ts",
+      "require": "./config/*.ts"
+    },
+    "./lib/*": {
+      "import": "./lib/*.ts",
+      "require": "./lib/*.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^20.17.46",
+    "typescript": "^5.8.3"
+  }
+}

@@ -1,0 +1,19 @@
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String
+  resource  String
+  details   String?  // JSON string
+  ipAddress String?
+  userAgent String?
+  success   Boolean
+  timestamp DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([action])
+  @@index([timestamp])
+  @@index([success])
+  @@map("AuditLog")
+}

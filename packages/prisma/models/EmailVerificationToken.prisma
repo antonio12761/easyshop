@@ -1,0 +1,11 @@
+model EmailVerificationToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  email     String?
+  userId    String
+  user      User     @relation("UserToEmailTokens", fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@map("EmailVerificationToken")
+}
